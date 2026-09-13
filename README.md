@@ -21,7 +21,7 @@ The saltire drawn as a mesh: four nodes linked through a node at the centre, wit
 
 ## Network versions
 
-Anything that belongs to one network gets that network's version: its tools, repos, Discord roles and channels. Network marks sit on Night instead of saltire blue, and the network's colour fills the centre node and the outer mesh, so they read as part of the family and still differ at 16px.
+Anything that belongs to one network gets that network's version: its tools, websites, wiki, repos, Discord roles and channels. Where a logo appears, use the network lockup (`scotmesh/meshcore`), not the plain ScotMesh one. Network marks sit on Night instead of saltire blue, and the network's colour fills the centre node and the outer mesh, so they read as part of the family and still differ at 16px.
 
 | | Network | Tint | Deep (text on light) | Files |
 | --- | --- | --- | --- | --- |
@@ -38,7 +38,8 @@ Every network folder has the same set:
 | `mark.svg`, `mark-1024.png`, `mark-512.png` | | Avatars for the network's tools, bots and repos |
 | `mark-small.svg`, `favicon.ico`, `favicon-16/32/48.png`, `apple-touch-icon.png` | | Browser icons for the network's tools |
 | `lockup-on-dark.svg/png`, `lockup-on-light.svg/png` | | `scotmesh/meshcore` alongside the mark |
-| `lockup-short-on-dark.svg/png`, `lockup-short-on-light.svg/png` | 5.6:1 | The network mark with `scotmesh`, for tight spaces such as an app's nav bar |
+| `lockup-stacked-on-dark.svg/png`, `lockup-stacked-on-light.svg/png` | about 4:1 | `scotmesh` over `/meshcore` beside the mark. **The default for anything belonging to one network**: nav bars, site headers, README section headings |
+| `lockup-short-on-dark.svg/png`, `lockup-short-on-light.svg/png` | 5.6:1 | The network mark with `scotmesh`, only where the network is already obvious and space is very tight |
 | `readme-header.svg/png` | 1600×400 | README banner for the network's repos |
 | `github-social-preview.svg/png` | 1280×640 | Repo social preview |
 | `og-image.svg/png` | 1200×630 | Link previews for the network's websites |

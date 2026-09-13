@@ -261,6 +261,21 @@ function lockup(rel, { net, fill, netFill, short = false, pngScale = 4 }) {
   asset(rel, w, T, net ? `ScotMesh ${net.name}` : 'ScotMesh', inner, [[rel.replace(/\.svg$/, '.png'), w * pngScale, T * pngScale]]);
 }
 
+// Stacked network lockup: the network mark, then "scotmesh" over "/network". About 4:1, for nav bars and site headers.
+function lockupStacked(rel, { net, fill, netFill, pngScale = 4 }) {
+  const T = 120, gap = 28, s1 = 62, s2 = 50, lineGap = 12;
+  const p1 = outline(FONT.mono, 'scotmesh', 0, 0, s1, -0.03);
+  const p2 = outline(FONT.mono, `/${net.slug}`, 0, 0, s2, -0.02);
+  const h1 = p1.bottom - p1.top, h2 = p2.bottom - p2.top;
+  const top = (T - (h1 + lineGap + h2)) / 2;
+  const x = T + gap;
+  const w1 = outline(FONT.mono, 'scotmesh', x - s1 * 0.04, top - p1.top, s1, -0.03);
+  const w2 = outline(FONT.mono, `/${net.slug}`, x - s2 * 0.02, top + h1 + lineGap - p2.top, s2, -0.02);
+  const w = Math.ceil(x + Math.max(w1.width - s1 * 0.08, w2.width - s2 * 0.04));
+  const inner = nested(mark({ net }), 0, 0, T) + `<path d="${w1.d}" fill="${fill}"/><path d="${w2.d}" fill="${netFill}"/>`;
+  asset(rel, w, T, `ScotMesh ${net.name}`, inner, [[rel.replace(/\.svg$/, '.png'), w * pngScale, T * pngScale]]);
+}
+
 // A mark on a transparent square with padding, for stickers.
 const padded = (inner, pad) => nested(inner, pad, pad, 100 - pad * 2);
 
@@ -356,6 +371,8 @@ for (const net of Object.values(NETWORKS)) {
   lockup(`${d}/lockup-on-dark.svg`, { net, fill: '#FFFFFF', netFill: net.tint });
   lockup(`${d}/lockup-on-light.svg`, { net, fill: COLOURS.night, netFill: net.deep });
   lockup(`${d}/lockup-short-on-dark.svg`, { net, fill: '#FFFFFF', short: true });
+  lockupStacked(`${d}/lockup-stacked-on-dark.svg`, { net, fill: '#FFFFFF', netFill: net.tint });
+  lockupStacked(`${d}/lockup-stacked-on-light.svg`, { net, fill: COLOURS.night, netFill: net.deep });
   lockup(`${d}/lockup-short-on-light.svg`, { net, fill: COLOURS.night, short: true });
   banner(`${d}/readme-header.png`, 1600, 400, t, { net, seed: 5, saltire: { cx: 1320, cy: 200, ext: 160 }, text: { x: 72, midY: 200, size: 88 } });
   banner(`${d}/og-image.png`, 1200, 630, t, { net, seed: 14, saltire: { cx: 925, cy: 315, ext: 205 }, text: { x: 76, midY: 315, size: 100 } });
