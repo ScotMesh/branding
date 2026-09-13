@@ -18,14 +18,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Assemble the site with the real asset files
         run: |
           mkdir -p _site/src/fonts
           cp -r site/. _site/
           cp -r logo wordmark networks github discord facebook youtube x-mastodon bluesky social web _site/
           cp src/fonts/OFL.txt _site/src/fonts/
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: _site
 
