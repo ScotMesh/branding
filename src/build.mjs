@@ -78,15 +78,27 @@ function png(svgRel, pngRel, w, h) {
   execFileSync('rsvg-convert', ['-w', String(w), '-h', String(h), '-o', out, path.join(ROOT, svgRel)]);
 }
 
+
+// The three networks ScotMesh runs. Tints share lightness and chroma (oklch 0.74 / 0.13) and differ only in hue;
+// `deep` is the same hue at 0.50 lightness, for text on light backgrounds.
+export const NETWORKS = {
+  meshcore: { name: 'MeshCore', slug: 'meshcore', tint: '#56B4F5', deep: '#0069A6', tagline: 'Long-range LoRa messaging across Scotland' },
+  meshtastic: { name: 'Meshtastic', slug: 'meshtastic', tint: '#65C281', deep: '#05773B', tagline: 'LoRa mesh nodes across Scotland' },
+  reticulum: { name: 'Reticulum', slug: 'reticulum', tint: '#B199F4', deep: '#6A51A4', tagline: 'Encrypted networking over any bearer' },
+};
+
 // ---------- the mark ----------
 // The saltire drawn as a mesh: four corner nodes linked through a centre node,
 // with fainter neighbours around the edge. Drawn on a 100-unit grid.
-function markGeometry({ fg, field, faint, small }) {
+// Network versions sit on Night, with the network tint in the centre node and the outer mesh.
+function markGeometry({ fg, field, faint, small, net }) {
   const k = small ? 25 : 24;
   const corners = [[k, k], [100 - k, k], [100 - k, 100 - k], [k, 100 - k]];
   const nodeR = small ? 11.5 : 9.5;
   const linkW = small ? 12 : 9;
-  const ringR = 11, ringW = small ? 8 : 6;
+  // small network marks need a bigger coloured centre to stay identifiable at 16px
+  const ringR = net ? (small ? 15 : 12.5) : 11, ringW = net && small ? 5 : small ? 8 : 6;
+  const meshColour = net ? net.tint : fg;
   let g = '';
   if (faint) {
     const edge = [[50, 9], [91, 50], [50, 91], [9, 50]];
@@ -95,8 +107,8 @@ function markGeometry({ fg, field, faint, small }) {
       const [ex, ey] = edge[i], [px, py] = corners[i], [qx, qy] = corners[(i + 1) % 4];
       lines += `M${px} ${py}L${ex} ${ey}L${qx} ${qy}`;
     }
-    g += `<path d="${lines}" fill="none" stroke="${fg}" stroke-opacity="0.32" stroke-width="2.2"/>`;
-    g += `<g fill="${fg}" fill-opacity="0.45">${edge.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.2"/>`).join('')}</g>`;
+    g += `<path d="${lines}" fill="none" stroke="${meshColour}" stroke-opacity="${net ? 0.55 : 0.32}" stroke-width="2.2"/>`;
+    g += `<g fill="${meshColour}" fill-opacity="${net ? 0.85 : 0.45}">${edge.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.2"/>`).join('')}</g>`;
   }
   // links stop under the centre ring so the ring reads on a transparent ground too
   const spokes = corners.map(([x, y]) => {
@@ -105,15 +117,21 @@ function markGeometry({ fg, field, faint, small }) {
   }).join('');
   g += `<path d="${spokes}" fill="none" stroke="${fg}" stroke-width="${linkW}" stroke-linecap="round"/>`;
   g += `<g fill="${fg}">${corners.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="${nodeR}"/>`).join('')}</g>`;
-  g += `<circle cx="50" cy="50" r="${ringR}" fill="${field ?? 'none'}" stroke="${fg}" stroke-width="${ringW}"/>`;
+  g += `<circle cx="50" cy="50" r="${ringR}" fill="${net ? net.tint : field ?? 'none'}" stroke="${fg}" stroke-width="${ringW}"/>`;
   return (field ? `<rect width="100" height="100" fill="${field}"/>` : '') + g;
 }
-const mark = (opts) => markGeometry({ fg: '#FFFFFF', field: COLOURS.saltire, faint: true, small: false, ...opts });
+const mark = (opts = {}) => markGeometry({
+  fg: '#FFFFFF', field: opts.net ? COLOURS.night : COLOURS.saltire, faint: true, small: false, ...opts,
+});
+const nested = (inner, x = 0, y = 0, size = 100) => `<svg x="${x}" y="${y}" width="${size}" height="${size}" viewBox="0 0 100 100">${inner}</svg>`;
 
 // ---------- mesh scenes (banners) ----------
-function meshScene({ W, H, seed, saltire, textZone, text }) {
+function meshScene({ W, H, seed, saltire, textZone, text, net }) {
   const R = rng(seed);
   const u = H / 500;
+  const glow = net ? net.tint : COLOURS.saltire;
+  const centre = net ? net.tint : COLOURS.saltire;
+  const packet = net ? net.tint : COLOURS.signal;
   const { cx, cy, ext } = saltire;
   const ends = [[cx - ext, cy - ext], [cx + ext, cy + ext], [cx + ext, cy - ext], [cx - ext, cy + ext]];
   const segDist = (px, py, [ax, ay], [bx, by]) => {
@@ -151,41 +169,56 @@ function meshScene({ W, H, seed, saltire, textZone, text }) {
   return `<rect width="${W}" height="${H}" fill="${COLOURS.night}"/>` +
     `<path d="${links}" fill="none" stroke="${MESH_LINK}" stroke-width="${r1(1.6 * u)}"/>` +
     `<g fill="${MESH_NODE}">${nodes.map(([x, y]) => `<circle cx="${r1(x)}" cy="${r1(y)}" r="${r1(3.6 * u)}"/>`).join('')}</g>` +
-    `<path d="${xLines}" fill="none" stroke="${COLOURS.saltire}" stroke-opacity="0.45" stroke-width="${r1(22 * u)}" stroke-linecap="round"/>` +
+    `<path d="${xLines}" fill="none" stroke="${glow}" stroke-opacity="${net ? 0.28 : 0.45}" stroke-width="${r1(22 * u)}" stroke-linecap="round"/>` +
     `<path d="${xLines}" fill="none" stroke="#FFFFFF" stroke-width="${r1(6 * u)}" stroke-linecap="round"/>` +
     `<g fill="#FFFFFF">${xNodes.map(([x, y]) => `<circle cx="${r1(x)}" cy="${r1(y)}" r="${r1(10 * u)}"/>`).join('')}</g>` +
-    `<circle cx="${cx}" cy="${cy}" r="${r1(15 * u)}" fill="${COLOURS.saltire}" stroke="#FFFFFF" stroke-width="${r1(7 * u)}"/>` +
-    `<circle cx="${r1(pkt[0])}" cy="${r1(pkt[1])}" r="${r1(16 * u)}" fill="${COLOURS.signal}" fill-opacity="0.25"/>` +
-    `<circle cx="${r1(pkt[0])}" cy="${r1(pkt[1])}" r="${r1(7 * u)}" fill="${COLOURS.signal}"/>` +
+    `<circle cx="${cx}" cy="${cy}" r="${r1(15 * u)}" fill="${centre}" stroke="#FFFFFF" stroke-width="${r1(7 * u)}"/>` +
+    `<circle cx="${r1(pkt[0])}" cy="${r1(pkt[1])}" r="${r1(16 * u)}" fill="${packet}" fill-opacity="0.25"/>` +
+    `<circle cx="${r1(pkt[0])}" cy="${r1(pkt[1])}" r="${r1(7 * u)}" fill="${packet}"/>` +
     (text ?? '');
 }
 
-// Wordmark, tagline and protocol line stacked and vertically centred on `midY`.
-function textBlock({ x, midY, size, tagline = true, protocols = true }) {
-  const wordGap = size * 0.2, lineGap = size * 0.16;
-  const tagSize = size * 0.325, protoSize = size * 0.2;
+// Wordmark (plus network name), tagline and protocol line stacked and vertically centred on `midY`.
+function textBlock({ x, midY, size, tagline = true, protocols = true, net }) {
+  const tagText = net ? net.tagline : TAGLINE;
+  const wordGap = size * 0.2, lineGap = size * 0.16, netGap = size * 0.1;
+  const tagSize = size * 0.325, protoSize = size * 0.2, netSize = size * 0.56;
   const probe = outline(FONT.mono, 'scotmesh', 0, 0, size, -0.03);
   const wordH = probe.bottom - probe.top;
-  const tagProbe = outline(FONT.condensed, TAGLINE, 0, 0, tagSize);
+  const netText = net ? `/${net.slug}` : '';
+  const netProbe = net && outline(FONT.mono, netText, 0, 0, netSize, -0.02);
+  const netH = net ? netProbe.bottom - netProbe.top : 0;
+  const tagProbe = outline(FONT.condensed, tagText, 0, 0, tagSize);
   const tagH = tagProbe.bottom - tagProbe.top;
   const protoProbe = outline(FONT.monoRegular, PROTOCOLS, 0, 0, protoSize);
   const protoH = protoProbe.bottom - protoProbe.top;
-  const total = wordH + (tagline ? wordGap + tagH : 0) + (protocols ? lineGap + protoH : 0);
+  const showProto = protocols && !net;
+  const total = wordH + (net ? netGap + netH : 0) + (tagline ? wordGap + tagH : 0) + (showProto ? lineGap + protoH : 0);
   let top = midY - total / 2;
   let out = '';
   const word = outline(FONT.mono, 'scotmesh', x - size * 0.04, top - probe.top, size, -0.03);
   out += `<path d="${word.d}" fill="#FFFFFF"/>`;
-  top += wordH + wordGap;
+  top += wordH;
+  let width = word.width;
+  if (net) {
+    top += netGap;
+    const n = outline(FONT.mono, netText, x - netSize * 0.02, top - netProbe.top, netSize, -0.02);
+    out += `<path d="${n.d}" fill="${net.tint}"/>`;
+    width = Math.max(width, n.width);
+    top += netH;
+  }
+  top += wordGap;
   if (tagline) {
-    const t = outline(FONT.condensed, TAGLINE, x, top - tagProbe.top, tagSize);
+    const t = outline(FONT.condensed, tagText, x, top - tagProbe.top, tagSize);
     out += `<path d="${t.d}" fill="${TAGLINE_TINT}"/>`;
+    width = Math.max(width, t.width);
     top += tagH + lineGap;
   }
-  if (protocols) {
+  if (showProto) {
     const p = outline(FONT.monoRegular, PROTOCOLS, x, top - protoProbe.top, protoSize);
     out += `<path d="${p.d}" fill="${PROTOCOL_TINT}"/>`;
   }
-  return { svg: out, width: word.width };
+  return { svg: out, width };
 }
 
 // ---------- build ----------
@@ -195,24 +228,52 @@ function asset(rel, w, h, title, inner, pngs = []) {
   built.push(rel);
   for (const [pngRel, pw, ph] of pngs) { png(rel, pngRel, pw, ph); built.push(pngRel); }
 }
+function pngOnly(svgRel, pngRel, w, h) { png(svgRel, pngRel, w, h); built.push(pngRel); }
+function ico(dir, sources) {
+  execFileSync('magick', [...sources, 'favicon.ico'], { cwd: path.join(ROOT, dir) });
+  built.push(`${dir}/favicon.ico`);
+}
+function banner(rel, W, H, title, { saltire, text, seed, net, png: withPng = true }) {
+  let block = null, zone = null;
+  if (text) {
+    block = textBlock({ ...text, net });
+    zone = { x0: 0, x1: text.x + block.width + 60, y0: 0, y1: H };
+  }
+  const svgRel = rel.replace(/\.png$/, '.svg');
+  asset(svgRel, W, H, title, meshScene({ W, H, seed, saltire, textZone: zone, text: block?.svg, net }), withPng ? [[rel, W, H]] : []);
+}
+
+// Lockup: mark tile, then "scotmesh" (and "/network") set to the tile's height.
+function lockup(rel, { net, fill, netFill, pngScale = 4 }) {
+  const size = 108, T = 120, gap = 36;
+  const probe = outline(FONT.mono, 'scotmesh', 0, 0, size, -0.03);
+  const baseline = T / 2 - (probe.top + probe.bottom) / 2;
+  const word = outline(FONT.mono, 'scotmesh', T + gap - size * 0.04, baseline, size, -0.03);
+  let inner = nested(mark({ net }), 0, 0, T) + `<path d="${word.d}" fill="${fill}"/>`;
+  let right = T + gap + word.width - size * 0.08;
+  if (net) {
+    const n = outline(FONT.mono, `/${net.slug}`, right + size * 0.02, baseline, size, -0.03);
+    inner += `<path d="${n.d}" fill="${netFill}"/>`;
+    right += n.width - size * 0.02;
+  }
+  const w = Math.ceil(right);
+  asset(rel, w, T, net ? `ScotMesh ${net.name}` : 'ScotMesh', inner, [[rel.replace(/\.svg$/, '.png'), w * pngScale, T * pngScale]]);
+}
+
+// A mark on a transparent square with padding, for stickers.
+const padded = (inner, pad) => nested(inner, pad, pad, 100 - pad * 2);
+
+// ===== ScotMesh =====
 
 // Logo
-const markSvg = (opts) => `<svg x="0" y="0" width="100" height="100" viewBox="0 0 100 100">${mark(opts)}</svg>`;
-asset('logo/scotmesh-mark.svg', 100, 100, 'ScotMesh', markSvg(), [
+asset('logo/scotmesh-mark.svg', 100, 100, 'ScotMesh', nested(mark()), [
   ['logo/scotmesh-mark-1024.png', 1024, 1024], ['logo/scotmesh-mark-512.png', 512, 512], ['logo/scotmesh-mark-256.png', 256, 256],
 ]);
-asset('logo/scotmesh-mark-small.svg', 100, 100, 'ScotMesh', markSvg({ faint: false, small: true }), [
-  ['logo/scotmesh-mark-small-64.png', 64, 64], ['logo/favicon-48.png', 48, 48], ['logo/favicon-32.png', 32, 32], ['logo/favicon-16.png', 16, 16],
+asset('logo/scotmesh-mark-small.svg', 100, 100, 'ScotMesh', nested(mark({ faint: false, small: true })), [
+  ['logo/scotmesh-mark-small-64.png', 64, 64],
 ]);
 asset('logo/scotmesh-glyph-blue.svg', 100, 100, 'ScotMesh', mark({ field: null, fg: COLOURS.saltire }), [['logo/scotmesh-glyph-blue-512.png', 512, 512]]);
 asset('logo/scotmesh-glyph-white.svg', 100, 100, 'ScotMesh', mark({ field: null, fg: '#FFFFFF' }), [['logo/scotmesh-glyph-white-512.png', 512, 512]]);
-execFileSync('magick', ['logo/favicon-16.png', 'logo/favicon-32.png', 'logo/favicon-48.png', 'logo/favicon.ico'], { cwd: ROOT });
-built.push('logo/favicon.ico');
-
-// Platform avatars (same mark, named for where they go)
-png('logo/scotmesh-mark.svg', 'avatars/github-org-avatar.png', 1024, 1024);
-png('logo/scotmesh-mark.svg', 'avatars/discord-server-icon.png', 512, 512);
-built.push('avatars/github-org-avatar.png', 'avatars/discord-server-icon.png');
 
 // Wordmarks and lockups
 for (const [bg, fill] of [['dark', '#FFFFFF'], ['light', COLOURS.night]]) {
@@ -222,45 +283,85 @@ for (const [bg, fill] of [['dark', '#FFFFFF'], ['light', COLOURS.night]]) {
   const ww = Math.ceil(word.width - size * 0.08), wh = Math.ceil(probe.bottom - probe.top);
   asset(`wordmark/scotmesh-wordmark-on-${bg}.svg`, ww, wh, 'scotmesh', `<path d="${word.d}" fill="${fill}"/>`,
     [[`wordmark/scotmesh-wordmark-on-${bg}.png`, ww * 4, wh * 4]]);
-
-  const T = 120, gap = 36;
-  const baseline = T / 2 - (probe.top + probe.bottom) / 2;
-  const lw = outline(FONT.mono, 'scotmesh', T + gap - size * 0.04, baseline, size, -0.03);
-  const lockW = Math.ceil(T + gap + lw.width - size * 0.08);
-  asset(`wordmark/scotmesh-lockup-on-${bg}.svg`, lockW, T, 'ScotMesh',
-    `<svg width="${T}" height="${T}" viewBox="0 0 100 100">${mark()}</svg><path d="${lw.d}" fill="${fill}"/>`,
-    [[`wordmark/scotmesh-lockup-on-${bg}.png`, lockW * 4, T * 4]]);
+  lockup(`wordmark/scotmesh-lockup-on-${bg}.svg`, { fill });
 }
 
-// Banners
-function banner(rel, W, H, title, { saltire, text, seed }) {
-  let block = null, zone = null;
-  if (text) {
-    block = textBlock(text);
-    zone = { x0: 0, x1: text.x + block.width + 60, y0: 0, y1: H };
-  }
-  asset(rel.replace(/\.png$/, '.svg'), W, H, title, meshScene({ W, H, seed, saltire, textZone: zone, text: block?.svg }), [[rel, W, H]]);
-}
-banner('social/header-1500x500.png', 1500, 500, 'ScotMesh header', {
-  seed: 7, saltire: { cx: 1130, cy: 250, ext: 232 }, text: { x: 70, midY: 225, size: 100 },
-});
-banner('social/github-social-preview.png', 1280, 640, 'ScotMesh', {
-  seed: 12, saltire: { cx: 985, cy: 320, ext: 220 }, text: { x: 84, midY: 320, size: 104 },
-});
-banner('social/readme-header.png', 1600, 400, 'ScotMesh', {
-  seed: 5, saltire: { cx: 1320, cy: 200, ext: 160 }, text: { x: 72, midY: 200, size: 92 },
-});
-banner('social/discord-banner.png', 960, 540, 'ScotMesh Discord banner', {
-  seed: 21, saltire: { cx: 480, cy: 270, ext: 190 },
-});
-banner('social/discord-invite-splash.png', 1920, 1080, 'ScotMesh Discord invite background', {
-  seed: 33, saltire: { cx: 1500, cy: 540, ext: 360 },
-});
-
-// Website header art: no text, sparse on the left so page headings sit over it
+// Web: favicons, app icons, manifest, header art, link previews
+asset('web/favicon.svg', 100, 100, 'ScotMesh', nested(mark({ faint: false, small: true })), [
+  ['web/favicon-16.png', 16, 16], ['web/favicon-32.png', 32, 32], ['web/favicon-48.png', 48, 48],
+]);
+ico('web', ['favicon-16.png', 'favicon-32.png', 'favicon-48.png']);
+pngOnly('logo/scotmesh-mark.svg', 'web/apple-touch-icon.png', 180, 180);
+pngOnly('logo/scotmesh-mark.svg', 'web/icon-192.png', 192, 192);
+pngOnly('logo/scotmesh-mark.svg', 'web/icon-512.png', 512, 512);
+// maskable icons get cropped to a circle of 80% diameter, so the glyph shrinks onto a full field
+asset('web/icon-maskable.svg', 100, 100, 'ScotMesh', `<rect width="100" height="100" fill="${COLOURS.saltire}"/>` + nested(mark(), 12, 12, 76), [['web/icon-maskable-512.png', 512, 512]]);
+write('web/site.webmanifest', JSON.stringify({
+  name: 'ScotMesh', short_name: 'ScotMesh', theme_color: COLOURS.night, background_color: COLOURS.night, display: 'standalone',
+  icons: [
+    { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+    { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    { src: '/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+  ],
+}, null, 2) + '\n');
+built.push('web/site.webmanifest');
+banner('web/og-image.png', 1200, 630, 'ScotMesh', { seed: 14, saltire: { cx: 925, cy: 315, ext: 205 }, text: { x: 76, midY: 315, size: 100 } });
 write('web/header-mesh.svg', svgDoc(1500, 500, 'ScotMesh mesh', meshScene({
   W: 1500, H: 500, seed: 9, saltire: { cx: 1190, cy: 250, ext: 190 }, textZone: { x0: 0, x1: 820, y0: 0, y1: 500 },
 })));
 built.push('web/header-mesh.svg');
 
-console.log(built.map((f) => `  ${f}`).join('\n'));
+// GitHub
+pngOnly('logo/scotmesh-mark.svg', 'github/org-avatar.png', 1024, 1024);
+banner('github/social-preview.png', 1280, 640, 'ScotMesh', { seed: 12, saltire: { cx: 985, cy: 320, ext: 220 }, text: { x: 84, midY: 320, size: 104 } });
+banner('social/readme-header.png', 1600, 400, 'ScotMesh', { seed: 5, saltire: { cx: 1320, cy: 200, ext: 160 }, text: { x: 72, midY: 200, size: 92 } });
+
+// Discord
+pngOnly('logo/scotmesh-mark.svg', 'discord/server-icon.png', 512, 512);
+banner('discord/banner.png', 960, 540, 'ScotMesh Discord banner', { seed: 21, saltire: { cx: 480, cy: 270, ext: 190 } });
+banner('discord/invite-splash.png', 1920, 1080, 'ScotMesh Discord invite background', { seed: 33, saltire: { cx: 1500, cy: 540, ext: 360 } });
+banner('discord/discovery-splash.png', 1920, 1080, 'ScotMesh Discord discovery splash', { seed: 34, saltire: { cx: 960, cy: 540, ext: 330 } });
+banner('discord/event-cover.png', 800, 320, 'ScotMesh event', { seed: 41, saltire: { cx: 640, cy: 160, ext: 110 }, text: { x: 44, midY: 160, size: 64, protocols: false } });
+asset('discord/sticker-scotmesh.svg', 100, 100, 'ScotMesh', padded(mark(), 4), [['discord/sticker-scotmesh.png', 320, 320]]);
+pngOnly('logo/scotmesh-mark-small.svg', 'discord/emoji-scotmesh.png', 128, 128);
+
+// Facebook
+pngOnly('logo/scotmesh-mark.svg', 'facebook/profile.png', 720, 720);
+// group covers crop the sides on mobile, so everything important sits in the middle 1200px
+banner('facebook/group-cover.png', 1640, 856, 'ScotMesh', { seed: 51, saltire: { cx: 1180, cy: 428, ext: 230 }, text: { x: 250, midY: 428, size: 112 } });
+banner('facebook/event-cover.png', 1920, 1005, 'ScotMesh event', { seed: 52, saltire: { cx: 1400, cy: 502, ext: 300 }, text: { x: 200, midY: 502, size: 140 } });
+
+// YouTube: the banner's safe area on every device is the centre 1546×423
+pngOnly('logo/scotmesh-mark.svg', 'youtube/profile.png', 800, 800);
+banner('youtube/banner.png', 2560, 1440, 'ScotMesh', { seed: 61, saltire: { cx: 1830, cy: 720, ext: 170 }, text: { x: 560, midY: 720, size: 110 } });
+
+// X, Mastodon, Bluesky
+pngOnly('logo/scotmesh-mark.svg', 'x-mastodon/avatar.png', 400, 400);
+banner('x-mastodon/header.png', 1500, 500, 'ScotMesh header', { seed: 7, saltire: { cx: 1130, cy: 250, ext: 232 }, text: { x: 70, midY: 225, size: 100 } });
+pngOnly('logo/scotmesh-mark.svg', 'bluesky/avatar.png', 1000, 1000);
+banner('bluesky/banner.png', 3000, 1000, 'ScotMesh header', { seed: 71, saltire: { cx: 2260, cy: 500, ext: 464 }, text: { x: 140, midY: 450, size: 200 } });
+
+// ===== Networks =====
+for (const net of Object.values(NETWORKS)) {
+  const d = `networks/${net.slug}`;
+  const t = `ScotMesh ${net.name}`;
+  asset(`${d}/mark.svg`, 100, 100, t, nested(mark({ net })), [[`${d}/mark-1024.png`, 1024, 1024], [`${d}/mark-512.png`, 512, 512]]);
+  asset(`${d}/mark-small.svg`, 100, 100, t, nested(mark({ net, faint: false, small: true })), [
+    [`${d}/favicon-16.png`, 16, 16], [`${d}/favicon-32.png`, 32, 32], [`${d}/favicon-48.png`, 48, 48],
+    [`${d}/discord-role-icon.png`, 64, 64], [`${d}/discord-emoji.png`, 128, 128],
+  ]);
+  ico(d, ['favicon-16.png', 'favicon-32.png', 'favicon-48.png']);
+  pngOnly(`${d}/mark.svg`, `${d}/apple-touch-icon.png`, 180, 180);
+  lockup(`${d}/lockup-on-dark.svg`, { net, fill: '#FFFFFF', netFill: net.tint });
+  lockup(`${d}/lockup-on-light.svg`, { net, fill: COLOURS.night, netFill: net.deep });
+  banner(`${d}/readme-header.png`, 1600, 400, t, { net, seed: 5, saltire: { cx: 1320, cy: 200, ext: 160 }, text: { x: 72, midY: 200, size: 88 } });
+  banner(`${d}/og-image.png`, 1200, 630, t, { net, seed: 14, saltire: { cx: 925, cy: 315, ext: 205 }, text: { x: 76, midY: 315, size: 100 } });
+  banner(`${d}/github-social-preview.png`, 1280, 640, t, { net, seed: 12, saltire: { cx: 985, cy: 320, ext: 220 }, text: { x: 84, midY: 320, size: 104 } });
+  banner(`${d}/header.png`, 1500, 500, t, { net, seed: 7, saltire: { cx: 1130, cy: 250, ext: 232 }, text: { x: 70, midY: 235, size: 100 } });
+  write(`${d}/header-mesh.svg`, svgDoc(1500, 500, t, meshScene({
+    net, W: 1500, H: 500, seed: 9, saltire: { cx: 1190, cy: 250, ext: 190 }, textZone: { x0: 0, x1: 820, y0: 0, y1: 500 },
+  })));
+  built.push(`${d}/header-mesh.svg`);
+}
+
+console.log(`${built.length} files`);
