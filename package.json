@@ -1,0 +1,13 @@
+{
+  "name": "scotmesh-branding",
+  "version": "1.0.0",
+  "description": "ScotMesh brand assets",
+  "scripts": {
+    "build": "node src/build.mjs"
+  },
+  "type": "module",
+  "dependencies": {
+    "opentype.js": "^1.3.4"
+  },
+  "private": true
+}
