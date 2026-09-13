@@ -38,6 +38,7 @@ Every network folder has the same set:
 | `mark.svg`, `mark-1024.png`, `mark-512.png` | | Avatars for the network's tools, bots and repos |
 | `mark-small.svg`, `favicon.ico`, `favicon-16/32/48.png`, `apple-touch-icon.png` | | Browser icons for the network's tools |
 | `lockup-on-dark.svg/png`, `lockup-on-light.svg/png` | | `scotmesh/meshcore` alongside the mark |
+| `lockup-short-on-dark.svg/png`, `lockup-short-on-light.svg/png` | 5.6:1 | The network mark with `scotmesh`, for tight spaces such as an app's nav bar |
 | `readme-header.svg/png` | 1600×400 | README banner for the network's repos |
 | `github-social-preview.svg/png` | 1280×640 | Repo social preview |
 | `og-image.svg/png` | 1200×630 | Link previews for the network's websites |

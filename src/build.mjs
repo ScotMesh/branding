@@ -244,14 +244,15 @@ function banner(rel, W, H, title, { saltire, text, seed, net, png: withPng = tru
 }
 
 // Lockup: mark tile, then "scotmesh" (and "/network") set to the tile's height.
-function lockup(rel, { net, fill, netFill, pngScale = 4 }) {
+// `short` drops the network name, for tight spaces like an app's nav bar (about 5.6:1).
+function lockup(rel, { net, fill, netFill, short = false, pngScale = 4 }) {
   const size = 108, T = 120, gap = 36;
   const probe = outline(FONT.mono, 'scotmesh', 0, 0, size, -0.03);
   const baseline = T / 2 - (probe.top + probe.bottom) / 2;
   const word = outline(FONT.mono, 'scotmesh', T + gap - size * 0.04, baseline, size, -0.03);
   let inner = nested(mark({ net }), 0, 0, T) + `<path d="${word.d}" fill="${fill}"/>`;
   let right = T + gap + word.width - size * 0.08;
-  if (net) {
+  if (net && !short) {
     const n = outline(FONT.mono, `/${net.slug}`, right + size * 0.02, baseline, size, -0.03);
     inner += `<path d="${n.d}" fill="${netFill}"/>`;
     right += n.width - size * 0.02;
@@ -354,6 +355,8 @@ for (const net of Object.values(NETWORKS)) {
   pngOnly(`${d}/mark.svg`, `${d}/apple-touch-icon.png`, 180, 180);
   lockup(`${d}/lockup-on-dark.svg`, { net, fill: '#FFFFFF', netFill: net.tint });
   lockup(`${d}/lockup-on-light.svg`, { net, fill: COLOURS.night, netFill: net.deep });
+  lockup(`${d}/lockup-short-on-dark.svg`, { net, fill: '#FFFFFF', short: true });
+  lockup(`${d}/lockup-short-on-light.svg`, { net, fill: COLOURS.night, short: true });
   banner(`${d}/readme-header.png`, 1600, 400, t, { net, seed: 5, saltire: { cx: 1320, cy: 200, ext: 160 }, text: { x: 72, midY: 200, size: 88 } });
   banner(`${d}/og-image.png`, 1200, 630, t, { net, seed: 14, saltire: { cx: 925, cy: 315, ext: 205 }, text: { x: 76, midY: 315, size: 100 } });
   banner(`${d}/github-social-preview.png`, 1280, 640, t, { net, seed: 12, saltire: { cx: 985, cy: 320, ext: 220 }, text: { x: 84, midY: 320, size: 104 } });
