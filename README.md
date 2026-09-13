@@ -2,6 +2,8 @@
 
 # ScotMesh branding
 
+The full guidelines, with specs, rules and every download, are at **[scotmesh.github.io/branding](https://scotmesh.github.io/branding/)**.
+
 Logos, colours, type and graphics for every platform ScotMesh uses: GitHub, Discord, Facebook, YouTube, X, Mastodon, Bluesky and our websites. There are versions for the community as a whole and for each network we run: MeshCore, Meshtastic and Reticulum.
 
 ## The mark
@@ -15,7 +17,7 @@ The saltire drawn as a mesh: four nodes linked through a node at the centre, wit
 
 **Small sizes.** Below 48px, use `logo/scotmesh-mark-small.svg`. It drops the faint outer mesh and thickens the links so the saltire still reads at 16px. The favicons are built from it.
 
-**Clear space.** Keep at least the width of one corner node clear on every side of the mark (about a tenth of its width).
+**Clear space.** Keep at least 10% of the mark's width clear on every side, about half a corner node.
 
 **Don't** recolour the mark outside the palette, rotate it (a turned saltire is just a plus sign), stretch it, or put the blue mark on a busy photo without its field.
 
