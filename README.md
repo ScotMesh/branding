@@ -111,7 +111,7 @@ Every PNG banner has a matching SVG next to it.
 
 | File | Size | Where |
 | --- | --- | --- |
-| `facebook/group-cover.png` | 1640×856 | Group cover photo. Mobile crops the sides, so everything important sits in the middle |
+| `facebook/group-cover.png` | 1640×856 | Group cover photo. Desktop shows only the middle 1640×662 (mobile shows it all), so the wordmark and saltire sit inside that band |
 | `facebook/event-cover.png` | 1920×1005 | Event cover photo |
 | `facebook/profile.png` | 720×720 | Page profile picture, if we run a Page as well as the group |
 

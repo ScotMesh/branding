@@ -128,3 +128,24 @@ pre{background:var(--well);border:1px solid var(--line);border-radius:6px;paddin
 .netmark{display:flex;flex-direction:column;gap:.6rem}
 .dot{display:inline-block;width:.7rem;height:.7rem;border-radius:50%;vertical-align:middle;margin-right:.4rem}
 footer{max-width:1240px;margin:3rem auto 0;padding-top:1.5rem;border-top:1px solid var(--line);color:var(--muted);font-size:.95rem;display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;justify-content:space-between}
+
+/* platform asset picker */
+.kit{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:1.2rem}
+.kit-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}
+@media (max-width:700px){.kit-controls{grid-template-columns:minmax(0,1fr)}}
+.kit-controls label{display:flex;flex-direction:column;gap:.3rem}
+.kit-controls select{font:inherit;font-size:1rem;color:var(--mist);background:var(--well);border:1px solid var(--line);border-radius:4px;padding:.55rem .7rem;width:100%}
+.kit-controls select:focus-visible,.kit-toggle input:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+.kit-body{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:1.4rem;margin-top:1.2rem;align-items:start}
+@media (max-width:900px){.kit-body{grid-template-columns:minmax(0,1fr)}}
+.kit-preview{margin:0;display:flex;flex-direction:column;gap:.6rem;align-items:flex-start}
+.kit-frame{position:relative;width:100%;background:var(--well);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.kit-frame.checker{background:repeating-conic-gradient(#16233A 0 25%,#0C1729 0 50%) 0 0/20px 20px}
+.kit-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.kit-guide{position:absolute;border:2px dashed #E6EDF7;box-shadow:0 0 0 9999px rgba(10,20,36,.62);pointer-events:none;display:flex;align-items:flex-start;justify-content:flex-start}
+.kit-guide.circle{border-radius:50%}
+.kit-guide span{font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;background:var(--night);color:var(--mist);border:1px solid var(--line);border-radius:3px;padding:.1rem .4rem;margin:.4rem}
+.kit-guide.circle span{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);white-space:nowrap;margin:0}
+.kit-toggle{font-size:.92rem;color:var(--muted);display:flex;align-items:center;gap:.4rem;cursor:pointer}
+.kit-spec h3{margin-bottom:.8rem}
+.kit-actions{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.2rem}

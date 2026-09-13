@@ -349,9 +349,10 @@ function socialPlatforms(base, net) {
   asset(`${base}discord/sticker.svg`, 100, 100, name, padded(mark({ net }), 4), [[`${base}discord/sticker.png`, 320, 320]]);
   pngOnly(smallSvg, `${base}discord/emoji.png`, 128, 128);
 
-  // Facebook: group covers crop the sides on mobile, so everything important sits in the middle 1200px
+  // Facebook: desktop shows only the middle 1640×662 of a group cover (y 97–759); mobile shows all 856px.
+  // Wordmark and saltire stay well inside that band, the top and bottom strips carry background mesh only.
   pngOnly(markSvg, `${base}facebook/profile.png`, 720, 720);
-  banner(`${base}facebook/group-cover.png`, 1640, 856, name, o({ seed: 51, saltire: { cx: 1180, cy: 428, ext: 230 }, text: { x: 250, midY: 428, size: 112 } }));
+  banner(`${base}facebook/group-cover.png`, 1640, 856, name, o({ seed: 51, saltire: { cx: 1300, cy: 428, ext: 185 }, text: { x: 150, midY: 428, size: net ? 118 : 128 } }));
   banner(`${base}facebook/event-cover.png`, 1920, 1005, `${name} event`, o({ seed: 52, saltire: { cx: 1400, cy: 502, ext: 300 }, text: { x: 200, midY: 502, size: 140 } }));
 
   // YouTube: the banner's safe area on every device is the centre 1546×423
