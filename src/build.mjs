@@ -257,4 +257,10 @@ banner('social/discord-invite-splash.png', 1920, 1080, 'ScotMesh Discord invite 
   seed: 33, saltire: { cx: 1500, cy: 540, ext: 360 },
 });
 
+// Website header art: no text, sparse on the left so page headings sit over it
+write('web/header-mesh.svg', svgDoc(1500, 500, 'ScotMesh mesh', meshScene({
+  W: 1500, H: 500, seed: 9, saltire: { cx: 1190, cy: 250, ext: 190 }, textZone: { x0: 0, x1: 820, y0: 0, y1: 500 },
+})));
+built.push('web/header-mesh.svg');
+
 console.log(built.map((f) => `  ${f}`).join('\n'));

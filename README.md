@@ -63,6 +63,10 @@ Both are free under the SIL Open Font License, available from [Google Fonts](htt
 
 Every PNG has a matching SVG next to it.
 
+## Web
+
+`web/` holds what the ScotMesh websites use: `header-mesh.svg` (header art with no text, kept sparse on the left so headings sit over it) and the IBM Plex `woff2` files, so sites can self-host the fonts instead of loading them from Google. [scotmesh.net](https://github.com/ScotMesh/scotmesh.net) and [rns.scotmesh.net](https://github.com/ScotMesh/rns.scotmesh.net) show them in use.
+
 ## Building
 
 Everything is generated from `src/build.mjs`, so change the geometry or colours there rather than editing outputs by hand.
