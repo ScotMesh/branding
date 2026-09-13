@@ -49,6 +49,7 @@ Every network folder has the same set:
 | `header-mesh.svg` | 1500×500 | Header art with no text, for the network's websites |
 | `discord-role-icon.png` | 64×64 | Discord role icon for the network's role |
 | `discord-emoji.png` | 128×128 | Discord custom emoji, e.g. `:meshcore:` |
+| `discord/`, `facebook/`, `youtube/`, `x-mastodon/`, `bluesky/`, `groups/` | | **A full platform set for the network's own groups and servers**, identical in size and placement to the ScotMesh set under [Platforms](#platforms) |
 
 ## Wordmark
 
@@ -100,8 +101,8 @@ Every PNG banner has a matching SVG next to it.
 | `discord/invite-splash.png` | 1920×1080 | Invite background, needs boost level 1. The saltire sits right of centre, clear of the invite card |
 | `discord/discovery-splash.png` | 1920×1080 | Server Discovery listing, for Community servers in Discovery |
 | `discord/event-cover.png` | 800×320 | Scheduled event cover image |
-| `discord/sticker-scotmesh.png` | 320×320 | Server sticker |
-| `discord/emoji-scotmesh.png` | 128×128 | Custom emoji `:scotmesh:` |
+| `discord/sticker.png` | 320×320 | Server sticker |
+| `discord/emoji.png` | 128×128 | Custom emoji `:scotmesh:` |
 | `networks/<network>/discord-emoji.png` | 128×128 | Custom emoji `:meshcore:`, `:meshtastic:`, `:reticulum:` |
 | `networks/<network>/discord-role-icon.png` | 64×64 | Role icons for network roles, needs boost level 2 |
 | `logo/scotmesh-mark-512.png` | 512×512 | Bot and webhook avatars (network bots use their network's `mark-512.png`) |
@@ -129,6 +130,14 @@ Every PNG banner has a matching SVG next to it.
 | `x-mastodon/avatar.png` | 400×400 | X and Mastodon profile picture |
 | `bluesky/banner.png` | 3000×1000 | Bluesky banner |
 | `bluesky/avatar.png` | 1000×1000 | Bluesky avatar |
+
+### Chat groups
+
+| File | Size | Where |
+| --- | --- | --- |
+| `groups/icon.png` | 640×640 | WhatsApp, Telegram and Signal group photos (all crop to a circle) |
+
+Each network has the same set in `networks/<network>/`, so a MeshCore Facebook group uses `networks/meshcore/facebook/group-cover.png`, a Meshtastic Discord server uses `networks/meshtastic/discord/`, and so on.
 
 ### Websites
 

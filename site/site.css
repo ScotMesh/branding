@@ -19,7 +19,7 @@ html{scroll-behavior:smooth;scroll-padding-top:1.5rem}
 body{margin:0;background:var(--night);color:var(--mist);font-family:var(--sans);font-size:18px;line-height:1.55;padding-inline:16px;padding-block:0 4rem}
 a{color:var(--link)}
 a:focus-visible,button:focus-visible{outline:2px solid var(--link);outline-offset:2px}
-img{max-width:100%;display:block}
+img{max-width:100%;height:auto;display:block}
 h1,h2,h3{font-family:var(--mono);font-weight:600;line-height:1.15;margin:0;text-wrap:balance;letter-spacing:-.02em}
 h1{font-size:clamp(2.2rem,5.5vw,3.6rem)}
 h2{font-size:clamp(1.6rem,3vw,2.1rem)}
@@ -106,7 +106,7 @@ th{text-align:left;font-family:var(--mono);font-weight:400;font-size:.72rem;lett
 td{padding:.6rem .9rem;border-bottom:1px solid var(--line);vertical-align:middle}
 tr:last-child td{border-bottom:0}
 td.num{font-family:var(--mono);font-size:.85rem;font-variant-numeric:tabular-nums;white-space:nowrap}
-td .thumb{height:44px;width:auto;max-width:140px;border-radius:3px;border:1px solid var(--line)}
+td .thumb{width:auto;height:auto;max-height:44px;max-width:140px;border-radius:3px;border:1px solid var(--line)}
 td a.dl{font-family:var(--mono);font-size:.82rem;white-space:nowrap}
 .platform{margin-top:2rem}
 .platform h3{margin-bottom:.7rem}

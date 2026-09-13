@@ -23,7 +23,7 @@ jobs:
         run: |
           mkdir -p _site/src/fonts
           cp -r site/. _site/
-          cp -r logo wordmark networks github discord facebook youtube x-mastodon bluesky social web _site/
+          cp -r logo wordmark networks github discord facebook youtube x-mastodon bluesky social web groups _site/
           cp src/fonts/OFL.txt _site/src/fonts/
       - uses: actions/upload-pages-artifact@v4
         with:

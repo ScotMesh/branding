@@ -332,30 +332,42 @@ pngOnly('logo/scotmesh-mark.svg', 'github/org-avatar.png', 1024, 1024);
 banner('github/social-preview.png', 1280, 640, 'ScotMesh', { seed: 12, saltire: { cx: 985, cy: 320, ext: 220 }, text: { x: 84, midY: 320, size: 104 } });
 banner('social/readme-header.png', 1600, 400, 'ScotMesh', { seed: 5, saltire: { cx: 1320, cy: 200, ext: 160 }, text: { x: 72, midY: 200, size: 92 } });
 
-// Discord
-pngOnly('logo/scotmesh-mark.svg', 'discord/server-icon.png', 512, 512);
-banner('discord/banner.png', 960, 540, 'ScotMesh Discord banner', { seed: 21, saltire: { cx: 480, cy: 270, ext: 190 } });
-banner('discord/invite-splash.png', 1920, 1080, 'ScotMesh Discord invite background', { seed: 33, saltire: { cx: 1500, cy: 540, ext: 360 } });
-banner('discord/discovery-splash.png', 1920, 1080, 'ScotMesh Discord discovery splash', { seed: 34, saltire: { cx: 960, cy: 540, ext: 330 } });
-banner('discord/event-cover.png', 800, 320, 'ScotMesh event', { seed: 41, saltire: { cx: 640, cy: 160, ext: 110 }, text: { x: 44, midY: 160, size: 64, protocols: false } });
-asset('discord/sticker-scotmesh.svg', 100, 100, 'ScotMesh', padded(mark(), 4), [['discord/sticker-scotmesh.png', 320, 320]]);
-pngOnly('logo/scotmesh-mark-small.svg', 'discord/emoji-scotmesh.png', 128, 128);
+// Social platforms. Built once for ScotMesh and once per network, so each network's own
+// groups, servers and channels get a full set. `base` is '' or 'networks/<slug>/'.
+function socialPlatforms(base, net) {
+  const markSvg = net ? `${base}mark.svg` : 'logo/scotmesh-mark.svg';
+  const smallSvg = net ? `${base}mark-small.svg` : 'logo/scotmesh-mark-small.svg';
+  const name = net ? `ScotMesh ${net.name}` : 'ScotMesh';
+  const o = (extra) => ({ net, ...extra });
 
-// Facebook
-pngOnly('logo/scotmesh-mark.svg', 'facebook/profile.png', 720, 720);
-// group covers crop the sides on mobile, so everything important sits in the middle 1200px
-banner('facebook/group-cover.png', 1640, 856, 'ScotMesh', { seed: 51, saltire: { cx: 1180, cy: 428, ext: 230 }, text: { x: 250, midY: 428, size: 112 } });
-banner('facebook/event-cover.png', 1920, 1005, 'ScotMesh event', { seed: 52, saltire: { cx: 1400, cy: 502, ext: 300 }, text: { x: 200, midY: 502, size: 140 } });
+  // Discord
+  pngOnly(markSvg, `${base}discord/server-icon.png`, 512, 512);
+  banner(`${base}discord/banner.png`, 960, 540, `${name} Discord banner`, o({ seed: 21, saltire: { cx: 480, cy: 270, ext: 190 } }));
+  banner(`${base}discord/invite-splash.png`, 1920, 1080, `${name} Discord invite background`, o({ seed: 33, saltire: { cx: 1500, cy: 540, ext: 360 } }));
+  banner(`${base}discord/discovery-splash.png`, 1920, 1080, `${name} Discord discovery splash`, o({ seed: 34, saltire: { cx: 960, cy: 540, ext: 330 } }));
+  banner(`${base}discord/event-cover.png`, 800, 320, `${name} event`, o({ seed: 41, saltire: { cx: 640, cy: 160, ext: 110 }, text: { x: 44, midY: 160, size: 60, protocols: false } }));
+  asset(`${base}discord/sticker.svg`, 100, 100, name, padded(mark({ net }), 4), [[`${base}discord/sticker.png`, 320, 320]]);
+  pngOnly(smallSvg, `${base}discord/emoji.png`, 128, 128);
 
-// YouTube: the banner's safe area on every device is the centre 1546×423
-pngOnly('logo/scotmesh-mark.svg', 'youtube/profile.png', 800, 800);
-banner('youtube/banner.png', 2560, 1440, 'ScotMesh', { seed: 61, saltire: { cx: 1830, cy: 720, ext: 170 }, text: { x: 560, midY: 720, size: 110 } });
+  // Facebook: group covers crop the sides on mobile, so everything important sits in the middle 1200px
+  pngOnly(markSvg, `${base}facebook/profile.png`, 720, 720);
+  banner(`${base}facebook/group-cover.png`, 1640, 856, name, o({ seed: 51, saltire: { cx: 1180, cy: 428, ext: 230 }, text: { x: 250, midY: 428, size: 112 } }));
+  banner(`${base}facebook/event-cover.png`, 1920, 1005, `${name} event`, o({ seed: 52, saltire: { cx: 1400, cy: 502, ext: 300 }, text: { x: 200, midY: 502, size: 140 } }));
 
-// X, Mastodon, Bluesky
-pngOnly('logo/scotmesh-mark.svg', 'x-mastodon/avatar.png', 400, 400);
-banner('x-mastodon/header.png', 1500, 500, 'ScotMesh header', { seed: 7, saltire: { cx: 1130, cy: 250, ext: 232 }, text: { x: 70, midY: 225, size: 100 } });
-pngOnly('logo/scotmesh-mark.svg', 'bluesky/avatar.png', 1000, 1000);
-banner('bluesky/banner.png', 3000, 1000, 'ScotMesh header', { seed: 71, saltire: { cx: 2260, cy: 500, ext: 464 }, text: { x: 140, midY: 450, size: 200 } });
+  // YouTube: the banner's safe area on every device is the centre 1546×423
+  pngOnly(markSvg, `${base}youtube/profile.png`, 800, 800);
+  banner(`${base}youtube/banner.png`, 2560, 1440, name, o({ seed: 61, saltire: { cx: 1830, cy: 720, ext: 170 }, text: { x: 560, midY: 720, size: net ? 96 : 110 } }));
+
+  // X, Mastodon, Bluesky
+  pngOnly(markSvg, `${base}x-mastodon/avatar.png`, 400, 400);
+  banner(`${base}x-mastodon/header.png`, 1500, 500, `${name} header`, o({ seed: 7, saltire: { cx: 1130, cy: 250, ext: 232 }, text: { x: 70, midY: net ? 235 : 225, size: 100 } }));
+  pngOnly(markSvg, `${base}bluesky/avatar.png`, 1000, 1000);
+  banner(`${base}bluesky/banner.png`, 3000, 1000, `${name} header`, o({ seed: 71, saltire: { cx: 2260, cy: 500, ext: 464 }, text: { x: 140, midY: net ? 470 : 450, size: 200 } }));
+
+  // Chat groups (WhatsApp, Telegram, Signal): square icon, cropped to a circle by all three
+  pngOnly(markSvg, `${base}groups/icon.png`, 640, 640);
+}
+socialPlatforms('');
 
 // ===== Networks =====
 for (const net of Object.values(NETWORKS)) {
@@ -382,6 +394,7 @@ for (const net of Object.values(NETWORKS)) {
     net, W: 1500, H: 500, seed: 9, saltire: { cx: 1190, cy: 250, ext: 190 }, textZone: { x0: 0, x1: 820, y0: 0, y1: 500 },
   })));
   built.push(`${d}/header-mesh.svg`);
+  socialPlatforms(`${d}/`, net);
 }
 
 console.log(`${built.length} files`);
